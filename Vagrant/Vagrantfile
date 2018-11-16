@@ -4,8 +4,11 @@ Vagrant.configure("2") do |config|
     cfg.vm.box = "bento/ubuntu-16.04"
     cfg.vm.hostname = "logger"
     config.vm.provision :shell, path: "bootstrap.sh"
-    cfg.vm.network :private_network, ip: "192.168.38.105", gateway: "192.168.38.1", dns: "8.8.8.8"
-
+    cfg.vm.network :private_network, ip: "192.168.131.105", gateway: "192.168.131.1", dns: "8.8.8.8"
+    
+    # disables annoying prompt about enabling
+    cfg.vm.synced_folder ".", "/vagrant", disabled: true
+    
     cfg.vm.provider "vmware_fusion" do |v, override|
       v.vmx["displayname"] = "logger"
       v.memory = 2048
@@ -34,7 +37,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provider :vmware_esxi do |esxi|
       esxi.esxi_hostname = '192.168.1.8'
       esxi.esxi_username = 'root'
-      esxi.esxi_password = 'file:C:\Users\david\Desktop\keys\vagrant.txt'
+      esxi.esxi_password = 'file:/Users/dtulis144/.esxi'
       esxi.esxi_hostport = 22
       esxi.esxi_disk_store = 'datastore1'
       esxi.esxi_resource_pool = '/VAGRANT'
@@ -59,9 +62,9 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.102", gateway: "192.168.38.1"
+    cfg.vm.network :private_network, ip: "192.168.131.102", gateway: "192.168.131.1"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "192.168.38.102"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "192.168.131.102"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
@@ -111,7 +114,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provider :vmware_esxi do |esxi|
       esxi.esxi_hostname = '192.168.1.8'
       esxi.esxi_username = 'root'
-      esxi.esxi_password = 'file:C:\Users\david\Desktop\keys\vagrant.txt'
+      esxi.esxi_password = 'file:/Users/dtulis144/.esxi'
       esxi.esxi_hostport = 22
       esxi.esxi_disk_store = 'datastore1'
       esxi.esxi_resource_pool = '/VAGRANT'
@@ -129,9 +132,9 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.103", gateway: "192.168.38.1", dns: "192.168.38.102"
+    cfg.vm.network :private_network, ip: "192.168.131.103", gateway: "192.168.131.1", dns: "192.168.131.102"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.103 -dns 192.168.38.102"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.131.103 -dns 192.168.131.102"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
@@ -181,7 +184,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provider :vmware_esxi do |esxi|
       esxi.esxi_hostname = '192.168.1.8'
       esxi.esxi_username = 'root'
-      esxi.esxi_password = 'file:C:\Users\david\Desktop\keys\vagrant.txt'
+      esxi.esxi_password = 'file:/Users/dtulis144/.esxi'
       esxi.esxi_hostport = 22
       esxi.esxi_disk_store = 'datastore1'
       esxi.esxi_resource_pool = '/VAGRANT'
@@ -199,9 +202,9 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.104", gateway: "192.168.38.1", dns: "192.168.38.102"
+    cfg.vm.network :private_network, ip: "192.168.131.104", gateway: "192.168.131.1", dns: "192.168.131.102"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.104 -dns 192.168.38.102"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.131.104 -dns 192.168.131.102"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
@@ -252,7 +255,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provider :vmware_esxi do |esxi|
       esxi.esxi_hostname = '192.168.1.8'
       esxi.esxi_username = 'root'
-      esxi.esxi_password = 'file:C:\Users\david\Desktop\keys\vagrant.txt'
+      esxi.esxi_password = 'file:/Users/dtulis144/.esxi'
       esxi.esxi_hostport = 22
       esxi.esxi_disk_store = 'datastore1'
       esxi.esxi_resource_pool = '/VAGRANT'
