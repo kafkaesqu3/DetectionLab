@@ -8,7 +8,7 @@
 # https://github.com/clong/DetectionLab/issues
 
 print_usage() {
-  echo "Usage: ./build.sh <virtualbox | vmware_desktop>  <--vagrant-only | --packer-only>"
+  echo "Usage: ./build.sh <virtualbox | vmware_desktop | vmware_esxi>  <--vagrant-only | --packer-only>"
   exit 0
 }
 
@@ -100,10 +100,11 @@ list_providers() {
     (echo >&2 "You need to install a provider such as VirtualBox or VMware Fusion to continue.")
     exit 1
   fi
+  (echo >&2 "vmware_esxi")
   (echo >&2 -e "\\nWhich provider would you like to use?")
   read -r PROVIDER
   # Sanity check
-  if [[ "$PROVIDER" != "virtualbox" ]] && [[ "$PROVIDER" != "vmware_desktop" ]]; then
+  if [[ "$PROVIDER" != "virtualbox" ]] && [[ "$PROVIDER" != "vmware_desktop" ]] && [[ "$PROVIDER" != "vmware_esxi" ]] ; then
     (echo >&2 "Please choose a valid provider. \"$PROVIDER\" is not a valid option.")
     exit 1
   fi
@@ -115,10 +116,10 @@ check_boxes_built() {
   BOXES_BUILT=$(find "$DL_DIR"/Boxes -name "*.box" | wc -l)
   if [ "$BOXES_BUILT" -gt 0 ]; then
     if [ "$VAGRANT_ONLY" -eq 1 ]; then
-      (echo >&2 "WARNING: You seem to have at least one .box file present in $DL_DIR/Boxes already. If you would like fresh boxes downloaded, please remove all files from the Boxes directory and re-run this script.")
+      (echo >&2 "WARNING: You seem to have at least one .box file present in $DL_DIR/Boxes already. WARNING: You seem to have at least one .box file present in $DL_DIR/Boxes already, but i'm not going to waste your time and make you redownload. ")
       DOWNLOAD_BOXES=0
     else
-      (echo >&2 "You seem to have at least one .box file in $DL_DIR/Boxes. This script does not support pre-built boxes. Please either delete the existing boxes or follow the build steps in the README to continue.")
+      (echo >&2 "You seem to have at least one .box file in $DL_DIR/Boxes, cancelling the Packer build")
       exit 1
     fi
   fi
@@ -251,10 +252,10 @@ vagrant_reload_host() {
 post_build_checks() {
   # If the curl operation fails, we'll just leave the variable equal to 0
   # This is needed to prevent the script from exiting if the curl operation fails
-  CALDERA_CHECK=$(curl -ks -m 2 https://192.168.38.105:8888 | grep -c '302: Found' || echo "")
-  SPLUNK_CHECK=$(curl -ks -m 2 https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F | grep -c 'This browser is not supported by Splunk' || echo "")
-  FLEET_CHECK=$(curl -ks -m 2 https://192.168.38.105:8412 | grep -c 'Kolide Fleet' || echo "")
-  ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.38.103 -m 2)
+  CALDERA_CHECK=$(curl -ks -m 2 https://192.168.131.105:8888 | grep -c '302: Found' || echo "")
+  SPLUNK_CHECK=$(curl -ks -m 2 https://192.168.131.105:8000/en-US/account/login?return_to=%2Fen-US%2F | grep -c 'This browser is not supported by Splunk' || echo "")
+  FLEET_CHECK=$(curl -ks -m 2 https://192.168.131.105:8412 | grep -c 'Kolide Fleet' || echo "")
+  ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.131.103 -m 2)
   [[ $ATA_CHECK == 401 ]] && ATA_CHECK=1
 
   BASH_MAJOR_VERSION=$(/bin/bash --version | grep 'GNU bash' | grep -o version\.\.. | cut -d ' ' -f 2 | cut -d '.' -f 1)
@@ -302,6 +303,10 @@ parse_cli_arguments() {
       PACKER_PROVIDER="$1"
       ;;
       vmware_desktop)
+      PROVIDER="$1"
+      PACKER_PROVIDER="vmware"
+      ;;
+      vmware_esxi)
       PROVIDER="$1"
       PACKER_PROVIDER="vmware"
       ;;
@@ -377,13 +382,13 @@ choose_md5_tool() {
 # Downloads pre-built Packer boxes from detectionlab.network to save time during CI builds
 download_boxes() {
   choose_md5_tool
-  if [ "$PROVIDER" == "virtualbox" ]; then
-    wget "https://www.detectionlab.network/windows_2016_virtualbox.box" -O "$DL_DIR"/Boxes/windows_2016_virtualbox.box
-    wget "https://www.detectionlab.network/windows_10_virtualbox.box" -O "$DL_DIR"/Boxes/windows_10_virtualbox.box
-  elif [ "$PROVIDER" == "vmware_desktop" ]; then
-    wget "https://www.detectionlab.network/windows_2016_vmware.box" -O "$DL_DIR"/Boxes/windows_2016_vmware.box
-    wget "https://www.detectionlab.network/windows_10_vmware.box" -O "$DL_DIR"/Boxes/windows_10_vmware.box
-  fi
+  # if [ "$PROVIDER" == "virtualbox" ]; then
+  #   wget "https://www.detectionlab.network/windows_2016_virtualbox.box" -O "$DL_DIR"/Boxes/windows_2016_virtualbox.box
+  #   wget "https://www.detectionlab.network/windows_10_virtualbox.box" -O "$DL_DIR"/Boxes/windows_10_virtualbox.box
+  # elif [ "$PROVIDER" == "vmware_desktop" ]; then
+  #   wget "https://www.detectionlab.network/windows_2016_vmware.box" -O "$DL_DIR"/Boxes/windows_2016_vmware.box
+  #   wget "https://www.detectionlab.network/windows_10_vmware.box" -O "$DL_DIR"/Boxes/windows_10_vmware.box
+  # fi
 
   # Ensure Windows 10 box exists
   if [ ! -f "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box ]; then

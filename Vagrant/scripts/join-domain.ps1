@@ -4,8 +4,8 @@
 Write-Host 'Join the domain'
 
 Write-Host "First, set DNS to DC to join the domain"
-$newDNSServers = "192.168.38.102"
-$adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPAddress -match "192.168.38."}
+$newDNSServers = "192.168.131.102"
+$adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPAddress -match "192.168.131."}
 $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}
 
 Write-Host "Now join the domain"
